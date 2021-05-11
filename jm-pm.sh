@@ -46,6 +46,14 @@ sudo ufw allow 3478/udp
 sudo ufw allow 5349/tcp
 sudo ufw enable
 
+
+#Install Jisti Meet
+echo '
+#--------------------------------------------------
+# Starting Installing Jitsi Meet
+#--------------------------------------------------
+'
+
 sudo apt install jitsi-meet
 
 sudo /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh
