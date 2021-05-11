@@ -163,8 +163,23 @@ sed -i "s|//    'fodeviceselection',|    'fodeviceselection',|g" "$JM_CONF_PATH"
 sed -i "s|//    'livestreaming',|    'livestreaming',|g" "$JM_CONF_PATH"
 sed -i "s|//    'videoquality',|    'videoquality',|g" "$JM_CONF_PATH"
 sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
-sed -i "s|'security'|'security'\n     ],|g" "$JM_CONF_PATH"
-sed -i "s|'sharedvideo', 'shareaudio',|/*'sharedvideo', 'shareaudio',*/|g" "$JM_CONF_PATH"
+sed -i "s|// prejoinPageEnabled: false,| prejoinPageEnabled: true,|g" "$JM_CONF_PATH"
+
+ 
+isInFile=$(cat $JM_CONF_PATH | grep -c "/*'sharedvideo', 'shareaudio',*/")
+isInFile2=$(cat $JM_CONF_PATH | grep -c "security'\n     ],")
+
+if [ $isInFile2 -eq 0 ]; then
+   echo "Bracket already commented"
+else
+   sed -i "s|'security'|'security'\n     ],|g" "$JM_CONF_PATH"
+fi
+
+if [ $isInFile -eq 0 ]; then
+   echo "Sharedvideo and Shareaudio already commented"
+else
+   sed -i "s|'sharedvideo', 'shareaudio',|/*'sharedvideo', 'shareaudio',*/|g" "$JM_CONF_PATH"
+fi
 
 echo "
 ########################################################################
@@ -174,11 +189,11 @@ echo "
               For customized support: gonfreecs600@gmail.com
 ########################################################################
 "
-echo "Rebooting in..."
-secs=$((15))
+echo "Restarting Jitsi services in..."
+secs=$((10))
 while [ $secs -gt 0 ]; do
    echo -ne "$secs\033[0K\r"
    sleep 1
    : $((secs--))
 done
-reboot
+sudo systemctl restart jitsi-videobridge2 jicofo prosody nginx
