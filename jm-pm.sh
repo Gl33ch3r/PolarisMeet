@@ -3,14 +3,17 @@
 # for Debian/*buntu binaries.
 # GNU GPLv3 or later.
 DOMAIN="secure.polarismeet.me"
-IPADD="121.58.244.87"
+IPADD="121.58.244.78"
+EMAIL="jconadera@gmail.com"
 #DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
 CSS_FILE="/usr/share/jitsi-meet/css/all.css"
 TITLE_FILE="/usr/share/jitsi-meet/title.html"
 INT_CONF="/usr/share/jitsi-meet/interface_config.js"
 BUNDLE_JS="/usr/share/jitsi-meet/libs/app.bundle.min.js"
 SIP_PATH="/etc/jitsi/videobridge/sip-communicator.properties"
-SYSTEM_PATH ="/etc/systemd/system.conf"
+SYSTEM_PATH="/etc/systemd/system.conf"
+HOSTS_PATH="/etc/hosts"
+JM_CONF_PATH="/etc/jitsi/meet/$DOMAIN-config.js"
 #
 JM_IMG_PATH="/usr/share/jitsi-meet/images"
 WTM2_PATH="$JM_IMG_PATH/polaris.png"
@@ -33,7 +36,14 @@ echo '
 sudo apt-add-repository universe
 sudo apt update
 sudo hostnamectl set-hostname $DOMAIN
-echo $IPADD $DOMAIN >> /etc/hosts
+
+
+if grep -Fxq "$IPADD $DOMAIN" "$HOSTS_PATH"
+then
+   echo "Hostname Already exist"
+else
+   echo $IPADD $DOMAIN >> "$HOSTS_PATH"
+fi
 curl https://download.jitsi.org/jitsi-key.gpg.key | sudo sh -c 'gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg'
 echo 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | sudo tee /etc/apt/sources.list.d/jitsi-stable.list > /dev/null
 sudo apt update
@@ -44,7 +54,7 @@ sudo ufw allow 10000/udp
 sudo ufw allow 22/tcp
 sudo ufw allow 3478/udp
 sudo ufw allow 5349/tcp
-sudo ufw enable
+echo "y" | sudo ufw enable
 
 
 #Install Jisti Meet
@@ -54,16 +64,20 @@ echo '
 #--------------------------------------------------
 '
 
-sudo apt install jitsi-meet
+sudo apt install jitsi-meet -y
 
-sudo /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh
+echo $EMAIL | sudo /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh
 
 sed -i "s|org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|#org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|g" "$SIP_PATH"
-echo "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS="$IPADD >> "$SIP_PATH"
-
-echo "DefaultLimitNOFILE=65000" >> "$SYSTEM_PATH"
-echo "DDefaultLimitNPROC=65000" >> "$SYSTEM_PATH"
-echo "DefaultTasksMax=65000" >> "$SYSTEM_PATH"
+if grep -Fxq "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$IPADD" "$SIP_PATH"
+then
+   echo "NAT_HARVESTER_PUBLIC_ADDRESS Already exist"
+else
+   echo "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS="$IPADD >> "$SIP_PATH"
+fi
+sed -i "s|#DefaultLimitNOFILE=|DefaultLimitNOFILE=65000|g" "$SYSTEM_PATH"
+sed -i "s|#DDefaultLimitNPROC=|DDefaultLimitNPROC=65000|g" "$SYSTEM_PATH"
+sed -i "s|#DefaultTasksMax=|DefaultTasksMax=65000|g" "$SYSTEM_PATH"
 
 
 #Install Jisti Meet
@@ -142,6 +156,16 @@ if [ -f "$INT_CONF" ]; then
 else
  echo "This setup doesn't have a static interface_config.js, checking changes..."
 fi
+
+sed -i "s|// toolbarButtons:| toolbarButtons:|g" "$JM_CONF_PATH" 
+sed -i "s|//    'microphone',|    'microphone',|g" "$JM_CONF_PATH" 
+sed -i "s|//    'fodeviceselection',|    'fodeviceselection',|g" "$JM_CONF_PATH" 
+sed -i "s|//    'livestreaming',|    'livestreaming',|g" "$JM_CONF_PATH"
+sed -i "s|//    'videoquality',|    'videoquality',|g" "$JM_CONF_PATH"
+sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
+sed -i "s|'security'|'security'\n     ],|g" "$JM_CONF_PATH"
+sed -i "s|'sharedvideo', 'shareaudio',|/*'sharedvideo', 'shareaudio',*/|g" "$JM_CONF_PATH"
+
 echo "
 ########################################################################
                         Customization complete!!
@@ -150,3 +174,11 @@ echo "
               For customized support: gonfreecs600@gmail.com
 ########################################################################
 "
+echo "Rebooting in..."
+secs=$((15))
+while [ $secs -gt 0 ]; do
+   echo -ne "$secs\033[0K\r"
+   sleep 1
+   : $((secs--))
+done
+reboot
