@@ -23,7 +23,7 @@ WB_PATH="$JM_IMG_PATH/welcome-bg.png"
 #
 #
 APP_NAME="Polaris Meet"
-MOVILE_APP_NAME="Polaris Meet"
+MOBILE_APP_NAME="Polaris Meet"
 PART_USER="Participant"
 LOCAL_USER="me"
 #
@@ -40,7 +40,7 @@ sudo hostnamectl set-hostname $DOMAIN
 
 if grep -Fxq "$IPADD $DOMAIN" "$HOSTS_PATH"
 then
-   echo "Hostname Already exist"
+   echo "Hostname already exist"
 else
    echo $IPADD $DOMAIN >> "$HOSTS_PATH"
 fi
@@ -68,10 +68,16 @@ sudo apt install jitsi-meet -y
 
 echo $EMAIL | sudo /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh
 
-sed -i "s|org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|#org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|g" "$SIP_PATH"
+if grep -Fxq "#org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES" "$SIP_PATH"
+then
+   echo "STUN_MAPPING_HARVESTER_ADDRESSES already commented"
+else
+   sed -i "s|org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|#org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|g" "$SIP_PATH"
+fi
+
 if grep -Fxq "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS=$IPADD" "$SIP_PATH"
 then
-   echo "NAT_HARVESTER_PUBLIC_ADDRESS Already exist"
+   echo "NAT_HARVESTER_PUBLIC_ADDRESS already exist"
 else
    echo "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS="$IPADD >> "$SIP_PATH"
 fi
