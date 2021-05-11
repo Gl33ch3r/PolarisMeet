@@ -2,12 +2,15 @@
 # Polaris Meet
 # for Debian/*buntu binaries.
 # GNU GPLv3 or later.
-
-DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
+DOMAIN="secure.polarismeet.me"
+IPADD="121.58.244.87"
+#DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
 CSS_FILE="/usr/share/jitsi-meet/css/all.css"
 TITLE_FILE="/usr/share/jitsi-meet/title.html"
 INT_CONF="/usr/share/jitsi-meet/interface_config.js"
 BUNDLE_JS="/usr/share/jitsi-meet/libs/app.bundle.min.js"
+SIP_PATH="/etc/jitsi/videobridge/sip-communicator.properties"
+SYSTEM_PATH ="/etc/systemd/system.conf"
 #
 JM_IMG_PATH="/usr/share/jitsi-meet/images"
 WTM2_PATH="$JM_IMG_PATH/polaris.png"
@@ -21,7 +24,41 @@ MOVILE_APP_NAME="Polaris Meet"
 PART_USER="Participant"
 LOCAL_USER="me"
 #
-SEC_ROOM="TBD"
+#Adding Jitsi repository
+echo '
+#--------------------------------------------------
+# Preparing and Adding Jitsi Meet Repository...
+#--------------------------------------------------
+'
+sudo apt-add-repository universe
+sudo apt update
+sudo hostnamectl set-hostname $DOMAIN
+echo $IPADD $DOMAIN >> /etc/hosts
+curl https://download.jitsi.org/jitsi-key.gpg.key | sudo sh -c 'gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg'
+echo 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | sudo tee /etc/apt/sources.list.d/jitsi-stable.list > /dev/null
+sudo apt update
+
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 10000/udp
+sudo ufw allow 22/tcp
+sudo ufw allow 3478/udp
+sudo ufw allow 5349/tcp
+sudo ufw enable
+
+sudo apt install jitsi-meet
+
+sudo /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh
+
+sed -i "s|org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|#org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES|g" "$SIP_PATH"
+echo "org.ice4j.ice.harvest.NAT_HARVESTER_PUBLIC_ADDRESS="$IPADD >> "$SIP_PATH"
+
+echo "DefaultLimitNOFILE=65000" >> "$SYSTEM_PATH"
+echo "DDefaultLimitNPROC=65000" >> "$SYSTEM_PATH"
+echo "DefaultTasksMax=65000" >> "$SYSTEM_PATH"
+
+
+#Install Jisti Meet
 echo '
 #--------------------------------------------------
 # Starting Polaris Meet Customization...
