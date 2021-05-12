@@ -8,6 +8,7 @@ EMAIL="jconadera@gmail.com"
 #DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
 CSS_FILE="/usr/share/jitsi-meet/css/all.css"
 TITLE_FILE="/usr/share/jitsi-meet/title.html"
+INDEX_FILE="/usr/share/jitsi-meet/index.html"
 INT_CONF="/usr/share/jitsi-meet/interface_config.js"
 BUNDLE_JS="/usr/share/jitsi-meet/libs/app.bundle.min.js"
 SIP_PATH="/etc/jitsi/videobridge/sip-communicator.properties"
@@ -128,15 +129,18 @@ sed -i "s|jitsiLogo_square.png|polaris_record.png|g" "$BUNDLE_JS"
 #Customize room title
 sed -i "s|Jitsi Meet|$APP_NAME|g" "$TITLE_FILE"
 sed -i "s| powered by the Jitsi Videobridge||g" "$TITLE_FILE"
+#Adding google font style
+sed -i 's|<link rel="manifest" id="manifest-placeholder">|<link rel="manifest" id="manifest-placeholder">\n<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">|g' "$INDEX_FILE"
+
 
 #Customizing CSS
 sed -i "s|width:71px;height:32px|width:71px;height:50px|g" "$CSS_FILE" 
 sed -i "s|padding-bottom:0;background-color:#131519;height:400px;|padding-bottom:0;background-color:#131519;height:470px;|g" "$CSS_FILE" 
 sed -i "s|margin:104px 32px 0 32px;|margin:214px 32px 0 32px;|g" "$CSS_FILE"
-sed -i "s|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:400;|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:700;|g" "$CSS_FILE"
-sed -i "s|.subject-text{background:rgba(0,0,0,.6);border-radius:3px 0 0 3px;|.subject-text{background:rgba(0,0,0,.6);border-radius:10px 0 0 10px;|g" "$CSS_FILE"
+sed -i "s|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:400;|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:700;font-family:'Nunito';|g" "$CSS_FILE"
+sed -i "s|.subject-text{background:rgba(0,0,0,.6);border-radius:3px 0 0 3px;|.subject-text{background:rgba(0,0,0,.6);border-radius:10px 0 0 10px;font-family:'Nunito';|g" "$CSS_FILE"
 sed -i "s|.label{align-items:center;background:#36383c;border-radius:3px;|.label{align-items:center;background:#36383c;border-radius:10px;|g" "$CSS_FILE"
-sed -i "s|.subject-timer{background:rgba(0,0,0,.6);border-radius:0 3px 3px 0;|.subject-timer{background:rgba(0,0,0,.6);border-radius:0 10px 10px 0;margin: 0 0 4px 4px;|g" "$CSS_FILE"
+sed -i "s|.subject-timer{background:rgba(0,0,0,.8);border-radius:0 3px 3px 0;|.subject-timer{background:rgba(0,0,0,.6);border-radius:0 10px 10px 0;|g" "$CSS_FILE"
 sed -i "s|.welcome .header #enter_room{display:flex;align-items:center;max-width:480px;width:calc(100% - 32px);z-index:2;background-color:#fff;padding:4px;border-radius:4px;|.welcome .header #enter_room{display:flex;align-items:center;max-width:480px;width:calc(100% - 32px);z-index:2;background-color:#fff;padding:4px;border-radius:30px;|g" "$CSS_FILE"
 sed -i "s|.welcome .welcome-page-button{border:0;font-size:14px;background:#0074e0;border-radius:3px;|.welcome .welcome-page-button{border:0;font-size:14px;background:#0074e0;border-radius:30px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header #enter_room .enter-room-input-container .enter-room-input{border:0;|.welcome .header #enter_room .enter-room-input-container .enter-room-input{border-radius:30px;border:0;|g" "$CSS_FILE"
@@ -145,7 +149,10 @@ sed -i "s|.premeeting-screen .content input.field{background-color:#fff;border:n
 sed -i "s|.premeeting-screen .action-btn{border-radius:3px;|.premeeting-screen .action-btn{border-radius:20px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header .header-text-title{color:#fff;|.welcome .header .header-text-title{text-shadow:1px 1px #000000;color:#fff;|g" "$CSS_FILE"
 sed -i "s|.welcome .header .header-text-subtitle{color:#fff;|.welcome .header .header-text-subtitle{text-shadow:1px 1px #000000;color:#fff;|g" "$CSS_FILE"
-
+sed -i 's|flex;flex-direction:column;font-family:inherit;|flex;flex-direction:column;font-family:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif;|g' "$CSS_FILE"
+sed -i 'select,textarea{font-family:-apple-system,BlinkMacSystemFont,open_sanslight,"Helvetica Neue",Helvetica,Arial,sans-serif!important}|select,textarea{font-family:Nunito,sans-serif!important}|g' "$CSS_FILE"
+sed -i 'color:#fff;font-family:-apple-system,BlinkMacSystemFont,open_sanslight,"Helvetica Neue",Helvetica,Arial,sans-serif;|color:#fff;font-family:Nunitol,sans-serif|g' "$CSS_FILE"
+sed -i 'text-align:left;font-family:open_sanslight|text-align:left;font-family:Nunito|g' "$CSS_FILE"
 
 
 #Custom UI changes
@@ -186,12 +193,19 @@ sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
 sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
 sed -i "s|// prejoinPageEnabled: false,| prejoinPageEnabled: true,|g" "$JM_CONF_PATH"
 
-isInFile=$(cat $JM_CONF_PATH | grep -c "security'\n     ],")
+isInFile=$(cat $JM_CONF_PATH | grep -c "security' ],")
 
-if [ $isInFile -eq 0 ]; then
-   echo "Bracket already commented"
+#if [ $isInFile -eq 0 ]; then
+#   echo "Bracket already commented"
+#else
+#   sed -i "s|'security'|'security' ],|g" "$JM_CONF_PATH"
+#fi
+
+if grep -Fxq "'security' ]," "$JM_CONF_PATH"
+then
+     echo "Bracket already commented"
 else
-   sed -i "s|'security'|'security'\n     ],|g" "$JM_CONF_PATH"
+    sed -i "s|'security'|'security' ],|g" "$JM_CONF_PATH"
 fi
 
 echo "
