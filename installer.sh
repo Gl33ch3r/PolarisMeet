@@ -40,7 +40,7 @@ sudo hostnamectl set-hostname $DOMAIN
 
 if grep -Fxq "$IPADD $DOMAIN" "$HOSTS_PATH"
 then
-   echo "Hostname already exist"
+   echo "Hostname lready exist"
 else
    echo $IPADD $DOMAIN >> "$HOSTS_PATH"
 fi
@@ -134,9 +134,9 @@ sed -i "s|width:71px;height:32px|width:71px;height:50px|g" "$CSS_FILE"
 sed -i "s|padding-bottom:0;background-color:#131519;height:400px;|padding-bottom:0;background-color:#131519;height:470px;|g" "$CSS_FILE" 
 sed -i "s|margin:104px 32px 0 32px;|margin:214px 32px 0 32px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:400;|.welcome .header .header-text-title{color:#fff;font-size:42px;font-weight:700;|g" "$CSS_FILE"
-sed -i "s|.subject-text{background:rgba(0,0,0,.6);border-radius:3px 0 0 3px;|.subject-text{background:rgba(0,0,0,.6);border-radius:10px 10px 10px 10px;|g" "$CSS_FILE"
+sed -i "s|.subject-text{background:rgba(0,0,0,.6);border-radius:3px 0 0 3px;|.subject-text{background:rgba(0,0,0,.6);border-radius:10px 0 0 10px;|g" "$CSS_FILE"
 sed -i "s|.label{align-items:center;background:#36383c;border-radius:3px;|.label{align-items:center;background:#36383c;border-radius:10px;|g" "$CSS_FILE"
-sed -i "s|.subject-timer{background:rgba(0,0,0,.8);border-radius:0 3px 3px 0;|.subject-timer{background:rgba(0,0,0,0);border-radius:10px 10px 10px 10px;margin: 0 0 4px 4px;|g" "$CSS_FILE"
+sed -i "s|.subject-timer{background:rgba(0,0,0,.6);border-radius:0 3px 3px 0;|.subject-timer{background:rgba(0,0,0,.6);border-radius:0 10px 10px 0;margin: 0 0 4px 4px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header #enter_room{display:flex;align-items:center;max-width:480px;width:calc(100% - 32px);z-index:2;background-color:#fff;padding:4px;border-radius:4px;|.welcome .header #enter_room{display:flex;align-items:center;max-width:480px;width:calc(100% - 32px);z-index:2;background-color:#fff;padding:4px;border-radius:30px;|g" "$CSS_FILE"
 sed -i "s|.welcome .welcome-page-button{border:0;font-size:14px;background:#0074e0;border-radius:3px;|.welcome .welcome-page-button{border:0;font-size:14px;background:#0074e0;border-radius:30px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header #enter_room .enter-room-input-container .enter-room-input{border:0;|.welcome .header #enter_room .enter-room-input-container .enter-room-input{border-radius:30px;border:0;|g" "$CSS_FILE"
@@ -180,26 +180,18 @@ fi
 sed -i "s|// toolbarButtons:| toolbarButtons:|g" "$JM_CONF_PATH" 
 sed -i "s|//    'microphone',|    'microphone',|g" "$JM_CONF_PATH" 
 sed -i "s|//    'fodeviceselection',|    'fodeviceselection',|g" "$JM_CONF_PATH" 
-sed -i "s|//    'livestreaming',|    /*'livestreaming',*/|g" "$JM_CONF_PATH"
+sed -i "s|//    'livestreaming', 'etherpad', 'sharedvideo', 'shareaudio',|    /*'livestreaming', 'etherpad', 'sharedvideo', 'shareaudio',*/|g" "$JM_CONF_PATH"
 sed -i "s|//    'videoquality',|    'videoquality',|g" "$JM_CONF_PATH"
 sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
 sed -i "s|//    'tileview',|    'tileview',|g" "$JM_CONF_PATH"
 sed -i "s|// prejoinPageEnabled: false,| prejoinPageEnabled: true,|g" "$JM_CONF_PATH"
 
- 
-isInFile=$(cat $JM_CONF_PATH | grep -c "/*'sharedvideo', 'shareaudio',*/")
-isInFile2=$(cat $JM_CONF_PATH | grep -c "security'\n     ],")
+isInFile=$(cat $JM_CONF_PATH | grep -c "security'\n     ],")
 
-if [ $isInFile2 -eq 0 ]; then
+if [ $isInFile -eq 0 ]; then
    echo "Bracket already commented"
 else
    sed -i "s|'security'|'security'\n     ],|g" "$JM_CONF_PATH"
-fi
-
-if [ $isInFile -eq 0 ]; then
-   echo "Sharedvideo and Shareaudio already commented"
-else
-   sed -i "s|'sharedvideo', 'shareaudio',|/*'sharedvideo', 'shareaudio',*/|g" "$JM_CONF_PATH"
 fi
 
 echo "
@@ -211,6 +203,7 @@ echo "
 ########################################################################
 "
 echo "Restarting Jitsi services in..."
+
 secs=$((10))
 while [ $secs -gt 0 ]; do
    echo -ne "$secs\033[0K\r"
