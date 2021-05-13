@@ -2,8 +2,8 @@
 # Polaris Meet
 # for Debian/*buntu binaries.
 # GNU GPLv3 or later.
-DOMAIN="secure.polarismeet.me"
-IPADD="121.58.244.78"
+DOMAIN="beta.polarismeet.me"
+IPADD="121.58.244.86"
 EMAIL="jconadera@gmail.com"
 #DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
 CSS_FILE="/usr/share/jitsi-meet/css/all.css"
@@ -149,10 +149,10 @@ sed -i "s|.premeeting-screen .content input.field{background-color:#fff;border:n
 sed -i "s|.premeeting-screen .action-btn{border-radius:3px;|.premeeting-screen .action-btn{border-radius:20px;|g" "$CSS_FILE"
 sed -i "s|.welcome .header .header-text-title{color:#fff;|.welcome .header .header-text-title{text-shadow:1px 1px #000000;color:#fff;|g" "$CSS_FILE"
 sed -i "s|.welcome .header .header-text-subtitle{color:#fff;|.welcome .header .header-text-subtitle{text-shadow:1px 1px #000000;color:#fff;|g" "$CSS_FILE"
-sed -i "s|flex;flex-direction:column;font-family:inherit;|flex;flex-direction:column;font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;|g" "$CSS_FILE"
-sed -i "s|select,textarea{font-family:-apple-system,BlinkMacSystemFont,open_sanslight,'Helvetica Neue',Helvetica,Arial,sans-serif!important}|select,textarea{font-family:Nunito,sans-serif!important}|g" "$CSS_FILE"
-sed -i "s|color:#fff;font-family:-apple-system,BlinkMacSystemFont,open_sanslight,'Helvetica Neue',Helvetica,Arial,sans-serif;|color:#fff;font-family:Nunito,sans-serif|g" "$CSS_FILE"
-sed -i "s|text-align:left;font-family:open_sanslight|text-align:left;font-family:Nunito|g" "$CSS_FILE"
+sed -i 's|flex;flex-direction:column;font-family:inherit;|flex;flex-direction:column;font-family:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif;|g' "$CSS_FILE"
+sed -i 's|select,textarea{font-family:-apple-system,BlinkMacSystemFont,open_sanslight,"Helvetica Neue",Helvetica,Arial,sans-serif!important}|select,textarea{font-family:Nunito,sans-serif!important}|g' "$CSS_FILE"
+sed -i 's|color:#fff;font-family:-apple-system,BlinkMacSystemFont,open_sanslight,"Helvetica Neue",Helvetica,Arial,sans-serif;|color:#fff;font-family:Nunito,sans-serif|g' "$CSS_FILE"
+sed -i 's|text-align:left;font-family:open_sanslight|text-align:left;font-family:Nunito|g' "$CSS_FILE"
 
 
 #Custom UI changes
