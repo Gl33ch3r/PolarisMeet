@@ -2,8 +2,8 @@
 # Polaris Meet
 # for Debian/*buntu binaries.
 # GNU GPLv3 or later.
-DOMAIN="beta.polarismeet.me"
-IPADD="121.58.244.86"
+DOMAIN="web.polarismeet.me"
+IPADD="121.58.244.94"
 EMAIL="jconadera@gmail.com"
 APP_URL="https://play.google.com/store/apps/details?id=ph.polaris.app"
 #DOMAIN="$(ls /etc/prosody/conf.d/ | awk -F'.cfg' '!/localhost/{print $1}' | awk '!NF || !seen[$0]++')"
